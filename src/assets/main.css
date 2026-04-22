@@ -1,0 +1,40 @@
+@import './base.css';
+
+:root {
+  --primary-blue: #0052cc;   /* 메인 브랜드 블루 */
+  --light-blue: #deebff;     /* 선택된 항목 배경 */
+  --soft-blue: #f0f5ff;      /* 섹션 헤더/테이블 헤더 배경 */
+  --pale-blue: #f8fbff;      /* 전체 페이지/카드 배경 */
+  --dark-blue: #0747a6;      /* 제목/강조 텍스트 */
+  --border-blue: #c1d7ff;    /* 메인 테두리 색상 */
+  --text-dark: #172b4d;      /* 메인 본문 색상 */
+  --sidebar-bg: #f4f7fb;     /* 사이드바 배경 */
+}
+
+#app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--text-dark);
+  background-color: var(--pale-blue);
+}
+
+.main-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.content-area {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+/* Jira 스타일 스크롤바 커스텀 */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--soft-blue); }
+::-webkit-scrollbar-thumb { background: var(--border-blue); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-blue); }
