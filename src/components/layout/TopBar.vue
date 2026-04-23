@@ -2,27 +2,27 @@
   <header class="top-bar">
     <div class="logo">
       <span class="workspace-icon">🏢</span>
-      <span class="workspace-name">Jira Clone Workspace</span>
+      <span class="workspace-name">{{ workspaceName || 'Jira Clone Workspace' }}</span>
     </div>
     
     <!-- 사용자 세션 영역 -->
     <div class="user-session-container" v-click-outside="() => isUserMenuOpen = false">
       <div class="user-trigger" @click="isUserMenuOpen = !isUserMenuOpen">
-        <span class="user-name-label">{{ currentUser.name }}님</span>
-        <div class="avatar">{{ currentUser.name.charAt(0) }}</div>
+        <span class="user-name-label">{{ userName }}님</span>
+        <div class="avatar">{{ userName.charAt(0) }}</div>
       </div>
 
       <!-- 드롭다운 레이아웃 -->
       <div class="user-dropdown" v-if="isUserMenuOpen">
         <div class="dropdown-header">
           <div class="user-info-detail">
-            <strong>{{ currentUser.name }}</strong>
-            <span>{{ currentUser.email }}</span>
+            <strong>{{ userName }}</strong>
+            <span>{{ userEmail }}</span>
           </div>
         </div>
         <div class="dropdown-body">
           <div class="menu-item lang-toggle">
-            <span class="label">언어 (Language)</span>
+            <span class="label">{{ t.label_lang }}</span>
             <div class="lang-btns">
               <button 
                 :class="{ active: currentLang === 'KO' }" 
@@ -36,7 +36,7 @@
           </div>
           <div class="menu-divider"></div>
           <button class="menu-item logout-btn" @click="handleLogout">
-            <span class="icon">🚪</span> 로그아웃
+            <span class="icon">🚪</span> {{ t.logout }}
           </button>
         </div>
       </div>
@@ -46,15 +46,24 @@
 
 <script setup>
 import { ref } from 'vue';
+import { currentLang, setLang, t } from '../../api/i18n';
 
-// 샘플 사용자 정보
-const currentUser = ref({
-  name: '홍길동',
-  email: 'hong@example.com'
+const props = defineProps({
+  workspaceName: {
+    type: String,
+    default: ''
+  },
+  userName: {
+    type: String,
+    default: '홍길동'
+  },
+  userEmail: {
+    type: String,
+    default: 'user@example.com'
+  }
 });
 
 const isUserMenuOpen = ref(false);
-const currentLang = ref('KO');
 
 // 클릭 외부 감지 지시어
 const vClickOutside = {
@@ -72,9 +81,7 @@ const vClickOutside = {
 };
 
 const changeLang = (lang) => {
-  currentLang.value = lang;
-  console.log(`언어 변경: ${lang}`);
-  // 실제 연동 시 i18n 등을 처리
+  setLang(lang);
 };
 
 const handleLogout = () => {

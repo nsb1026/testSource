@@ -27,16 +27,16 @@ export const issueService = {
   
   /**
    * 이슈 목록 조회 (Spring Boot 연동 샘플)
-   * GET /api/issues?page=0&size=30
+   * GET /api/issues?page=0&size=30&workspaceId=...
    */
-  async fetchIssues(page = 0, size = 30) {
+  async fetchIssues(page = 0, size = 30, workspaceId = null) {
     try {
-      console.log(`[AJAX 호출] GET /api/issues?page=${page}&size=${size}`);
+      console.log(`[AJAX 호출] GET /api/issues?page=${page}&size=${size}&workspaceId=${workspaceId}`);
       
       // 실제 서버가 있을 경우 주석 해제하여 사용
       /*
       const response = await apiClient.get('/issues', {
-        params: { page, size }
+        params: { page, size, workspaceId }
       });
       return response.data; // Spring의 Page<T> 객체가 리턴됨
       */
@@ -48,9 +48,9 @@ export const issueService = {
           const issues = Array.from({ length: size }, (_, i) => ({
             id: page * size + i + 1,
             type: (i + 1) % 2 === 0 ? 'Problem' : 'TestRequest',
-            title: `[서버 데이터] Spring 연동 샘플 이슈 ${page * size + i + 1}`,
+            title: `[${workspaceId || 'Default'}] Spring 연동 샘플 이슈 ${page * size + i + 1}`,
             status: 'To Do',
-            workspace: 'Jira Clone Workspace',
+            workspace: workspaceId || 'Jira Clone Workspace',
             workType: 'Bug',
             modelInfo: 'Web-v1.0',
             importance: 'B',
@@ -80,8 +80,8 @@ export const issueService = {
   /**
    * 모델 목록 조회
    */
-  async fetchModels() {
-    console.log('AJAX 요청: 모델 목록 조회');
+  async fetchModels(workspaceId = null) {
+    console.log(`AJAX 요청: 모델 목록 조회 (workspaceId: ${workspaceId})`);
     return [
       { id: 1, name: 'Web-v1.0', category: 'Frontend', owner: '김철수', createdDate: '2024-01-01', description: '메인 프론트엔드 v1.0 모델' },
       { id: 2, name: 'Web-v1.1', category: 'Frontend', owner: '박지민', createdDate: '2024-03-15', description: '업데이트된 프론트엔드 v1.1 모델' },
@@ -92,10 +92,10 @@ export const issueService = {
   /**
    * 작업장 상세 정보 조회
    */
-  async fetchWorkspaceInfo() {
-    console.log('AJAX 요청: 작업장 상세 정보 조회');
+  async fetchWorkspaceInfo(workspaceId = null) {
+    console.log(`AJAX 요청: 작업장 상세 정보 조회 (workspaceId: ${workspaceId})`);
     return {
-      name: 'Jira Clone Workspace',
+      name: workspaceId ? `Workspace [${workspaceId}]` : 'Jira Clone Workspace',
       creator: '관리자',
       createdDate: '2024-01-01',
       description: '웹 서비스 통합 관리를 위한 개발 전용 작업장입니다.',

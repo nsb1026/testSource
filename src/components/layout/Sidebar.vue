@@ -19,14 +19,17 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
+import { t } from '../../api/i18n';
+
 defineProps({ currentMenu: String });
 defineEmits(['change-menu']);
 
-const menuItems = [
-  { id: 1, name: 'Issue', label: 'Issue', icon: '🎫' },
-  { id: 2, name: 'Models', label: 'Models', icon: '📱' },
-  { id: 3, name: 'WorkspaceInfo', label: '작업장 상세 정보', icon: 'ℹ️' },
-];
+const menuItems = computed(() => [
+  { id: 1, name: 'Issue', label: t.value.menu_issue, icon: '🎫' },
+  { id: 2, name: 'Models', label: t.value.menu_models, icon: '📱' },
+  { id: 3, name: 'WorkspaceInfo', label: t.value.menu_workspace, icon: 'ℹ️' },
+]);
 </script>
 
 <style scoped>

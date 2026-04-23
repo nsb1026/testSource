@@ -1,5 +1,5 @@
 <template>
-  <TopBar />
+  <TopBar :workspaceName="workspaceInfo?.name" :userName="userId || '홍길동'" />
   <div class="main-container">
     <!-- 사이드바: 메뉴 변경 및 현재 메뉴 상태 관리 -->
     <Sidebar :currentMenu="activeMenu" @change-menu="onChangeMenu" />
@@ -78,6 +78,10 @@ const workspaceInfo = ref(null); // 작업장 상세 정보
 const selectedIssue = ref(null); // 선택된 이슈
 const selectedModel = ref(null); // 선택된 모델
 
+// JSP 연동을 위한 파라미터 상태
+const workspaceId = ref(null);
+const userId = ref(null);
+
 // 모달 제어 상태 (누락된 변수 복구)
 const isFormModalOpen = ref(false);
 const formModalMode = ref('create');
@@ -88,7 +92,7 @@ const loading = ref(false);
  * 데이터 로드 함수 (페이징 지원)
  */
 const loadIssues = async (page = 0) => {
-  const pageData = await issueService.fetchIssues(page, pagination.value.size);
+  const pageData = await issueService.fetchIssues(page, pagination.value.size, workspaceId.value);
   issues.value = pageData.content;
   pagination.value = {
     totalPages: pageData.totalPages,
@@ -104,10 +108,17 @@ const loadIssues = async (page = 0) => {
 };
 
 onMounted(async () => {
-  // 초기 데이터 병렬 로드
+  // 1. URL 파라미터 추출 (JSP GET 방식 대응)
+  const params = new URLSearchParams(window.location.search);
+  workspaceId.value = params.get('workspaceId');
+  userId.value = params.get('userId');
+
+  console.log('JSP 호출 파라미터:', { workspaceId: workspaceId.value, userId: userId.value });
+
+  // 2. 초기 데이터 병렬 로드 (파라미터 전달)
   const [modelData, infoData] = await Promise.all([
-    issueService.fetchModels(),
-    issueService.fetchWorkspaceInfo()
+    issueService.fetchModels(workspaceId.value),
+    issueService.fetchWorkspaceInfo(workspaceId.value)
   ]);
   
   await loadIssues(0); // 이슈 첫 페이지 로드

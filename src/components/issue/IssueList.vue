@@ -3,10 +3,10 @@
     <!-- 헤더 영역 -->
     <div class="list-header">
       <div class="title-area">
-        <h2>Issues</h2>
+        <h2>{{ t.menu_issue }}</h2>
         <span class="total-count" v-if="pagination.totalElements">({{ pagination.totalElements }})</span>
       </div>
-      <button @click="$emit('create-new')" class="create-btn">+ Create</button>
+      <button @click="$emit('create-new')" class="create-btn">+ {{ t.btn_create }}</button>
     </div>
 
     <!-- 이슈 카드 리스트 영역 -->
@@ -29,7 +29,7 @@
       
       <!-- 데이터가 없을 때 -->
       <div v-if="issues.length === 0" class="empty-list">
-        이슈가 없습니다.
+        {{ currentLang === 'KO' ? '이슈가 없습니다.' : 'No issues found.' }}
       </div>
     </div>
 
@@ -59,6 +59,8 @@
 </template>
 
 <script setup>
+import { t, currentLang } from '../../api/i18n';
+
 defineProps({
   issues: { type: Array, default: () => [] },
   pagination: { type: Object, default: () => ({ totalPages: 0, number: 0, totalElements: 0 }) },
