@@ -47,7 +47,7 @@ export const issueService = {
           const totalElements = 100;
           const issues = Array.from({ length: size }, (_, i) => ({
             id: page * size + i + 1,
-            type: (i + 1) % 2 === 0 ? 'Problem' : 'TestRequest',
+            type: (i + 1) % 2 === 0 ? 'DEFECT' : 'TEST_ITEM',
             title: `[${workspaceId || 'Default'}] Spring 연동 샘플 이슈 ${page * size + i + 1}`,
             status: 'To Do',
             workspace: workspaceId || 'Jira Clone Workspace',

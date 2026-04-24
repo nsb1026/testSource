@@ -21,8 +21,8 @@
           <div class="info-item">
             <label>{{ t.label_type }}:</label>
             <select v-model="form.type" class="type-select" :disabled="mode === 'edit'">
-              <option value="Problem">{{ t.label_problem }}</option>
-              <option value="TestRequest">{{ t.label_test_request }}</option>
+              <option value="DEFECT">{{ t.label_problem }}</option>
+              <option value="TEST_ITEM">{{ t.label_test_request }}</option>
             </select>
           </div>
         </div>
@@ -71,7 +71,7 @@
             </div>
 
             <!-- 유형별 에디터 분기 -->
-            <template v-if="form.type === 'Problem'">
+            <template v-if="form.type === 'DEFECT'">
               <div class="form-section">
                 <label class="section-label">{{ t.label_problem }}</label>
                 <div class="quill-wrapper">
@@ -86,7 +86,7 @@
               </div>
             </template>
 
-            <template v-else-if="form.type === 'TestRequest'">
+            <template v-else-if="form.type === 'TEST_ITEM'">
               <div class="form-grid-2">
                 <div class="form-section">
                   <label class="section-label">{{ t.label_target_version }}</label>

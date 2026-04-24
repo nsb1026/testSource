@@ -23,18 +23,18 @@
           <div class="stat-group">
             <div class="group-title">
               <span class="type-indicator test-request"></span>
-              시험의뢰 (Test Request)
+              시험의뢰 (TEST_ITEM)
             </div>
             <div class="status-counters">
-              <div class="counter-item clickable" @click="$emit('view-issues', model.modelName, 'TestRequest', 'To Do')">
+              <div class="counter-item clickable" @click="$emit('view-issues', model.modelName, 'TEST_ITEM', 'To Do')">
                 <span class="count-label">To Do</span>
                 <span class="count-value">{{ model.testRequest.todo }}</span>
               </div>
-              <div class="counter-item clickable" @click="$emit('view-issues', model.modelName, 'TestRequest', 'In Progress')">
+              <div class="counter-item clickable" @click="$emit('view-issues', model.modelName, 'TEST_ITEM', 'In Progress')">
                 <span class="count-label">In Progress</span>
                 <span class="count-value highlight">{{ model.testRequest.inprogress }}</span>
               </div>
-              <div class="counter-item clickable" @click="$emit('view-issues', model.modelName, 'TestRequest', 'Done')">
+              <div class="counter-item clickable" @click="$emit('view-issues', model.modelName, 'TEST_ITEM', 'Done')">
                 <span class="count-label">Done</span>
                 <span class="count-value">{{ model.testRequest.done }}</span>
               </div>
@@ -45,18 +45,18 @@
           <div class="stat-group">
             <div class="group-title">
               <span class="type-indicator problem"></span>
-              문제점 (Problem)
+              문제점 (DEFECT)
             </div>
             <div class="status-counters">
-              <div class="counter-item clickable" @click="$emit('view-issues', model.modelName, 'Problem', 'To Do')">
+              <div class="counter-item clickable" @click="$emit('view-issues', model.modelName, 'DEFECT', 'To Do')">
                 <span class="count-label">To Do</span>
                 <span class="count-value">{{ model.problem.todo }}</span>
               </div>
-              <div class="counter-item clickable" @click="$emit('view-issues', model.modelName, 'Problem', 'In Progress')">
+              <div class="counter-item clickable" @click="$emit('view-issues', model.modelName, 'DEFECT', 'In Progress')">
                 <span class="count-label">In Progress</span>
                 <span class="count-value highlight">{{ model.problem.inprogress }}</span>
               </div>
-              <div class="counter-item clickable" @click="$emit('view-issues', model.modelName, 'Problem', 'Done')">
+              <div class="counter-item clickable" @click="$emit('view-issues', model.modelName, 'DEFECT', 'Done')">
                 <span class="count-label">Done</span>
                 <span class="count-value">{{ model.problem.done }}</span>
               </div>

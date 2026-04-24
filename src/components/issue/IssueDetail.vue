@@ -50,7 +50,7 @@
           <div class="info-item"><label>{{ t.label_workspace }}:</label> <span>{{ issue.workspace }}</span></div>
           <div class="info-item"><label>{{ t.col_model }}:</label> <span class="model-badge">{{ issue.modelInfo }}</span></div>
           <div class="info-item"><label>{{ t.label_work_type }}:</label> <span>{{ issue.workType }}</span></div>
-          <div class="info-item"><label>{{ t.label_type }}:</label> <span class="type-tag">{{ issue.type === 'Problem' ? t.label_problem : t.label_test_request }}</span></div>
+          <div class="info-item"><label>{{ t.label_type }}:</label> <span class="type-tag">{{ issue.type === 'DEFECT' ? t.label_problem : t.label_test_request }}</span></div>
         </div>
 
         <h1 class="issue-title">{{ issue.title }}</h1>
@@ -81,8 +81,8 @@
 
         <!-- 이슈 유형별 상세 구성 분기 -->
         
-        <!-- Case 1: 문제점 (Problem) -->
-        <template v-if="issue.type === 'Problem'">
+        <!-- Case 1: 문제점 (DEFECT) -->
+        <template v-if="issue.type === 'DEFECT'">
           <div class="section">
             <h3>{{ t.label_problem }}</h3>
             <div class="rich-view" v-html="issue.description"></div>
@@ -94,8 +94,8 @@
           </div>
         </template>
 
-        <!-- Case 2: 시험의뢰 (TestRequest) -->
-        <template v-else-if="issue.type === 'TestRequest'">
+        <!-- Case 2: 시험의뢰 (TEST_ITEM) -->
+        <template v-else-if="issue.type === 'TEST_ITEM'">
           <div class="test-meta-info">
             <div class="meta-item"><label>{{ t.label_target_version }}:</label> {{ issue.targetVersion || '-' }}</div>
             <div class="meta-item"><label>{{ t.label_request_date }}:</label> {{ issue.requestDate || '-' }}</div>

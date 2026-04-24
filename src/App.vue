@@ -210,7 +210,7 @@ const onSelectIssue = (issue) => {
 const onOpenCreateModal = () => {
   modalInitialData.value = {
     id: null,
-    type: 'Problem', // 기본 유형
+    type: 'DEFECT', // 기본 유형
     title: '',
     status: 'To Do',
     importance: 'B',
