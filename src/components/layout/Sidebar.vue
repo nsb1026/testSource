@@ -26,6 +26,7 @@ defineProps({ currentMenu: String });
 defineEmits(['change-menu']);
 
 const menuItems = computed(() => [
+  { id: 4, name: 'Dashboard', label: t.value.menu_dashboard, icon: '📊' },
   { id: 1, name: 'Issue', label: t.value.menu_issue, icon: '🎫' },
   { id: 2, name: 'Models', label: t.value.menu_models, icon: '📱' },
   { id: 3, name: 'WorkspaceInfo', label: t.value.menu_workspace, icon: 'ℹ️' },

@@ -8,6 +8,7 @@ const strings = {
   KO: {
     menu_issue: '이슈',
     menu_models: '모델 관리',
+    menu_dashboard: '모델별 현황',
     menu_workspace: '작업장 정보',
     col_type: '유형',
     col_title: '제목',
@@ -78,6 +79,7 @@ const strings = {
   EN: {
     menu_issue: 'Issues',
     menu_models: 'Models',
+    menu_dashboard: 'Dashboard',
     menu_workspace: 'Workspace Info',
     col_type: 'Type',
     col_title: 'Title',

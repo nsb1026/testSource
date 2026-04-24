@@ -9,6 +9,22 @@
       <button @click="$emit('create-new')" class="create-btn">+ {{ t.btn_create }}</button>
     </div>
 
+    <!-- 필터 표시 바 -->
+    <div class="filter-bar" v-if="filterModel || filterType || filterStatus">
+      <div class="filter-tags">
+        <span v-if="filterModel" class="filter-tag model" @click="$emit('remove-filter', 'model')" title="Remove model filter">
+          {{ filterModel }} <i class="close-icon">✕</i>
+        </span>
+        <span v-if="filterType" class="filter-tag type" @click="$emit('remove-filter', 'type')" title="Remove type filter">
+          {{ filterType }} <i class="close-icon">✕</i>
+        </span>
+        <span v-if="filterStatus" class="filter-tag status" @click="$emit('remove-filter', 'status')" title="Remove status filter">
+          {{ filterStatus }} <i class="close-icon">✕</i>
+        </span>
+      </div>
+      <button class="clear-all-btn" @click="$emit('clear-filter')" title="Clear All Filters">전체 해제</button>
+    </div>
+
     <!-- 이슈 카드 리스트 영역 -->
     <div class="list-content">
       <div 
@@ -19,6 +35,7 @@
         @click="$emit('select-issue', issue)"
       >
         <div class="issue-title">{{ issue.title }}</div>
+        <div class="issue-model-info" v-if="issue.modelInfo">{{ issue.modelInfo }}</div>
         <div class="issue-meta">
           <span class="status-tag" :class="issue.status.toLowerCase().replace(' ', '-')">
             {{ issue.status }}
@@ -64,10 +81,13 @@ import { t, currentLang } from '../../api/i18n';
 defineProps({
   issues: { type: Array, default: () => [] },
   pagination: { type: Object, default: () => ({ totalPages: 0, number: 0, totalElements: 0 }) },
-  selectedIssueId: Number
+  selectedIssueId: Number,
+  filterModel: String,
+  filterType: String,
+  filterStatus: String
 });
 
-defineEmits(['select-issue', 'create-new', 'page-change']);
+defineEmits(['select-issue', 'create-new', 'page-change', 'clear-filter', 'remove-filter']);
 </script>
 
 <style scoped>
@@ -88,6 +108,68 @@ defineEmits(['select-issue', 'create-new', 'page-change']);
   background-color: var(--pale-blue);
 }
 
+.filter-bar {
+  background-color: var(--soft-blue);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-blue);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.filter-tag {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 10px;
+  border: 1px solid rgba(0,0,0,0.05);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.filter-tag:hover {
+  filter: brightness(0.9);
+  transform: translateY(-1px);
+}
+
+.filter-tag.model { background-color: white; color: var(--primary-blue); border-color: var(--border-blue); }
+.filter-tag.type { background-color: var(--primary-blue); color: white; }
+.filter-tag.status { background-color: #006644; color: white; }
+
+.close-icon {
+  font-style: normal;
+  font-size: 8px;
+  opacity: 0.7;
+}
+
+.clear-all-btn {
+  background: none;
+  border: none;
+  color: #5e6c84;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 0;
+}
+
+.clear-all-btn:hover {
+  color: var(--primary-blue);
+  text-decoration: underline;
+}
+
 .title-area h2 { margin: 0; font-size: 16px; color: var(--dark-blue); font-weight: 700; }
 .total-count { font-size: 12px; color: var(--primary-blue); font-weight: 600; margin-left: 6px; }
 
@@ -103,8 +185,8 @@ defineEmits(['select-issue', 'create-new', 'page-change']);
   border-left-color: var(--primary-blue);
 }
 
-.issue-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-dark); line-height: 1.4; }
-
+.issue-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--text-dark); line-height: 1.4; }
+.issue-model-info { font-size: 11px; color: var(--primary-blue); font-weight: 700; margin-bottom: 8px; }
 .issue-meta {
   display: flex;
   justify-content: space-between;
@@ -117,6 +199,8 @@ defineEmits(['select-issue', 'create-new', 'page-change']);
 .status-tag.done { background: #e3fcef; color: #006644; }
 
 .issue-id { font-size: 11px; color: #8993a4; font-weight: 600; }
+
+.empty-list { padding: 40px 20px; text-align: center; color: #5e6c84; font-size: 14px; }
 
 .pagination-footer { padding: 12px 16px; border-top: 1px solid var(--border-blue); display: flex; justify-content: center; align-items: center; gap: 16px; background: var(--soft-blue); }
 .page-btn { background: white; border: 1px solid var(--border-blue); border-radius: 4px; width: 30px; height: 30px; cursor: pointer; color: var(--primary-blue); font-weight: 800; display: flex; align-items: center; justify-content: center; }

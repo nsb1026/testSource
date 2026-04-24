@@ -11,6 +11,12 @@
         <!-- 상단 고정 정보 바 -->
         <div class="info-banner">
           <div class="info-item"><label>{{ t.label_workspace }}:</label> <span>{{ form.workspace }}</span></div>
+          <div class="info-item">
+            <label>{{ t.col_model }}:</label>
+            <select v-model="form.modelInfo" class="type-select" :disabled="mode === 'edit'">
+              <option v-for="m in models" :key="m.id" :value="m.name">{{ m.name }}</option>
+            </select>
+          </div>
           <div class="info-item"><label>{{ t.label_work_type }}:</label> <span>{{ form.workType }}</span></div>
           <div class="info-item">
             <label>{{ t.label_type }}:</label>
@@ -192,7 +198,8 @@ const props = defineProps({
   isOpen: Boolean,
   mode: String,
   initialData: Object,
-  loading: Boolean
+  loading: Boolean,
+  models: { type: Array, default: () => [] }
 });
 
 const emit = defineEmits(['close', 'save']);

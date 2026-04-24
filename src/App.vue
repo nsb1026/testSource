@@ -4,16 +4,26 @@
     <!-- 사이드바: 메뉴 변경 및 현재 메뉴 상태 관리 -->
     <Sidebar :currentMenu="activeMenu" @change-menu="onChangeMenu" />
     
-    <main class="content-area">
+    <main class="content-area" :class="{ 'full-width': activeMenu === 'Dashboard' || activeMenu === 'WorkspaceInfo' }">
+      <!-- 0. Dashboard 메뉴 -->
+      <template v-if="activeMenu === 'Dashboard'">
+        <ModelDashboard :workspaceId="workspaceId" @view-issues="onViewIssues" />
+      </template>
+
       <!-- 1. Issue 메뉴 (이슈 목록 및 상세) -->
-      <template v-if="activeMenu === 'Issue'">
+      <template v-else-if="activeMenu === 'Issue'">
         <IssueList 
           :issues="issues" 
           :pagination="pagination"
           :selectedIssueId="selectedIssue?.id"
+          :filterModel="filterModel"
+          :filterType="filterType"
+          :filterStatus="filterStatus"
           @select-issue="onSelectIssue" 
           @create-new="onOpenCreateModal"
           @page-change="onPageChange"
+          @clear-filter="onClearFilters"
+          @remove-filter="onRemoveFilter"
         />
         <IssueDetail 
           :issue="selectedIssue" 
@@ -43,6 +53,7 @@
     :isOpen="isFormModalOpen"
     :mode="formModalMode"
     :initialData="modalInitialData"
+    :models="models"
     :loading="loading"
     @close="isFormModalOpen = false"
     @save="onSaveFromModal"
@@ -58,13 +69,14 @@ import IssueDetail from './components/issue/IssueDetail.vue';
 import IssueFormModal from './components/issue/IssueFormModal.vue';
 import ModelList from './components/model/ModelList.vue';
 import ModelDetail from './components/model/ModelDetail.vue';
+import ModelDashboard from './components/model/ModelDashboard.vue';
 import WorkspaceDetail from './components/workspace/WorkspaceDetail.vue';
 import { issueService } from './api/issueService';
 
 /**
  * 전역 상태 관리
  */
-const activeMenu = ref('Issue'); // 현재 활성화된 메뉴
+const activeMenu = ref('Dashboard'); // 현재 활성화된 메뉴 (대시보드 기본)
 const issues = ref([]);         // 이슈 목록 (현재 페이지)
 const pagination = ref({        // 페이징 정보
   totalPages: 0,
@@ -77,6 +89,9 @@ const workspaceInfo = ref(null); // 작업장 상세 정보
 
 const selectedIssue = ref(null); // 선택된 이슈
 const selectedModel = ref(null); // 선택된 모델
+const filterModel = ref(null);   // 이슈 목록 필터용 모델명
+const filterType = ref(null);    // 이슈 유형 필터
+const filterStatus = ref(null);  // 이슈 상태 필터
 
 // JSP 연동을 위한 파라미터 상태
 const workspaceId = ref(null);
@@ -92,18 +107,35 @@ const loading = ref(false);
  * 데이터 로드 함수 (페이징 지원)
  */
 const loadIssues = async (page = 0) => {
+  // 필터링된 데이터 로드 (실제 서비스에서는 API 파라미터로 전달)
   const pageData = await issueService.fetchIssues(page, pagination.value.size, workspaceId.value);
-  issues.value = pageData.content;
+  
+  let content = pageData.content;
+  
+  // Mock 레벨에서 필터링 시뮬레이션
+  if (filterModel.value) {
+    content = content.map(issue => ({ ...issue, modelInfo: filterModel.value }));
+  }
+  if (filterType.value) {
+    content = content.filter(issue => issue.type === filterType.value);
+  }
+  if (filterStatus.value) {
+    content = content.filter(issue => issue.status === filterStatus.value);
+  }
+
+  issues.value = content;
   pagination.value = {
     totalPages: pageData.totalPages,
-    totalElements: pageData.totalElements,
-    number: pageData.number,
+    totalElements: content.length, // 필터 결과 반영 (Mock)
+    number: page,
     size: pageData.size
   };
   
   // 첫 로딩이거나 현재 선택된 이슈가 목록에 없으면 첫 번째 아이템 선택
-  if (issues.value.length > 0 && !selectedIssue.value) {
+  if (issues.value.length > 0) {
     selectedIssue.value = issues.value[0];
+  } else {
+    selectedIssue.value = null;
   }
 };
 
@@ -141,6 +173,34 @@ const onPageChange = async (newPage) => {
  */
 const onChangeMenu = (menuName) => {
   activeMenu.value = menuName;
+  // 이슈 메뉴가 아닐 때 필터 초기화
+  if (menuName !== 'Issue') {
+    filterModel.value = null;
+    filterType.value = null;
+    filterStatus.value = null;
+  }
+};
+
+const onViewIssues = (modelName, type = null, status = null) => {
+  filterModel.value = modelName;
+  filterType.value = type;
+  filterStatus.value = status;
+  activeMenu.value = 'Issue';
+  loadIssues(0);
+};
+
+const onClearFilters = () => {
+  filterModel.value = null;
+  filterType.value = null;
+  filterStatus.value = null;
+  loadIssues(0);
+};
+
+const onRemoveFilter = (key) => {
+  if (key === 'model') filterModel.value = null;
+  else if (key === 'type') filterType.value = null;
+  else if (key === 'status') filterStatus.value = null;
+  loadIssues(0);
 };
 
 const onSelectIssue = (issue) => {

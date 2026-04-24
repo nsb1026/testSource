@@ -33,6 +33,10 @@
   background-color: #ffffff;
 }
 
+.content-area.full-width {
+  display: block;
+}
+
 /* Jira 스타일 스크롤바 커스텀 */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--soft-blue); }

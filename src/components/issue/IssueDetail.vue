@@ -48,6 +48,7 @@
         <!-- 기본 상단 정보 바 (고정 정보) -->
         <div class="info-banner">
           <div class="info-item"><label>{{ t.label_workspace }}:</label> <span>{{ issue.workspace }}</span></div>
+          <div class="info-item"><label>{{ t.col_model }}:</label> <span class="model-badge">{{ issue.modelInfo }}</span></div>
           <div class="info-item"><label>{{ t.label_work_type }}:</label> <span>{{ issue.workType }}</span></div>
           <div class="info-item"><label>{{ t.label_type }}:</label> <span class="type-tag">{{ issue.type === 'Problem' ? t.label_problem : t.label_test_request }}</span></div>
         </div>
@@ -278,6 +279,7 @@ const onDeleteComment = async (commentId) => {
 .info-banner { display: flex; gap: 24px; padding: 14px 20px; background: var(--soft-blue); border: 1px solid var(--border-blue); border-radius: 4px; margin-bottom: 32px; font-size: 13px; }
 .info-item label { font-weight: 700; color: var(--dark-blue); margin-right: 8px; }
 .type-tag { background: var(--primary-blue); color: white; padding: 2px 8px; border-radius: 3px; font-weight: 700; font-size: 11px; }
+.model-badge { background: #ffffff; color: var(--primary-blue); border: 1px solid var(--primary-blue); padding: 2px 8px; border-radius: 3px; font-weight: 700; font-size: 11px; }
 .issue-title { font-size: 26px; color: var(--dark-blue); margin-bottom: 24px; font-weight: 700; }
 .section { margin-bottom: 32px; }
 .section h3 { font-size: 16px; margin-bottom: 12px; color: var(--dark-blue); border-bottom: 2px solid var(--border-blue); padding-bottom: 8px; font-weight: 700; }
