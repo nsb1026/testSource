@@ -148,5 +148,49 @@ export const issueService = {
 
   async deleteComment(issueId, commentId) {
     return { success: true };
+  },
+
+  /**
+   * 이슈 생성
+   */
+  async createIssue(data) {
+    try {
+      console.log(`[AJAX 호출] POST /api/issues`, data);
+      
+      // 실제 서버 호출 시
+      // const response = await apiClient.post('/issues', data);
+      // return response.data;
+
+      // Mock 데이터 반환
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({ success: true, data: { ...data, id: Math.floor(Math.random() * 1000) } });
+        }, 500);
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * 이슈 수정
+   */
+  async updateIssue(id, data) {
+    try {
+      console.log(`[AJAX 호출] PUT /api/issues/${id}`, data);
+      
+      // 실제 서버 호출 시
+      // const response = await apiClient.put(`/issues/${id}`, data);
+      // return response.data;
+
+      // Mock 데이터 반환
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({ success: true, data });
+        }, 500);
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 };

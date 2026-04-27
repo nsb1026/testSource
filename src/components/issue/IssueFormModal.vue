@@ -12,10 +12,11 @@
         <div class="info-banner">
           <div class="info-item"><label>{{ t.label_workspace }}:</label> <span>{{ form.workspace }}</span></div>
           <div class="info-item">
-            <label>{{ t.col_model }}:</label>
-            <select v-model="form.modelInfo" class="type-select" :disabled="mode === 'edit'">
-              <option v-for="m in models" :key="m.id" :value="m.name">{{ m.name }}</option>
-            </select>
+            <BaseInput :label="t.col_model" required :error="errors.modelInfo">
+              <select v-model="form.modelInfo" class="type-select" :disabled="mode === 'edit'">
+                <option v-for="m in models" :key="m.id" :value="m.name">{{ m.name }}</option>
+              </select>
+            </BaseInput>
           </div>
           <div class="info-item"><label>{{ t.label_work_type }}:</label> <span>{{ form.workType }}</span></div>
           <div class="info-item">
@@ -66,8 +67,14 @@
 
             <!-- 제목 입력 -->
             <div class="form-section">
-              <label class="section-label">{{ t.label_title }}</label>
-              <input v-model="form.title" class="title-input" :placeholder="t.label_title_placeholder" />
+              <BaseInput 
+                :label="t.label_title" 
+                v-model="form.title" 
+                required 
+                :error="errors.title"
+                :placeholder="t.label_title_placeholder"
+                inputClass="title-input"
+              />
             </div>
 
             <!-- 유형별 에디터 분기 -->
@@ -89,12 +96,21 @@
             <template v-else-if="form.type === 'TEST_ITEM'">
               <div class="form-grid-2">
                 <div class="form-section">
-                  <label class="section-label">{{ t.label_target_version }}</label>
-                  <input v-model="form.targetVersion" class="full-input" />
+                  <BaseInput 
+                    :label="t.label_target_version" 
+                    v-model="form.targetVersion" 
+                    required 
+                    :error="errors.targetVersion" 
+                  />
                 </div>
                 <div class="form-section">
-                  <label class="section-label">{{ t.label_request_date }}</label>
-                  <input type="date" v-model="form.requestDate" class="full-input" :disabled="mode === 'edit'" />
+                  <BaseInput 
+                    :label="t.label_request_date" 
+                    required 
+                    :error="errors.requestDate"
+                  >
+                    <input type="date" v-model="form.requestDate" class="full-input" :disabled="mode === 'edit'" />
+                  </BaseInput>
                 </div>
               </div>
               <div class="form-section">
@@ -185,11 +201,13 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import UserSearchModal from './UserSearchModal.vue';
+import BaseInput from '../common/BaseInput.vue';
 import { t } from '../../api/i18n';
+import { issueService } from '../../api/issueService';
 
 /**
  * Props & Emits
@@ -198,16 +216,17 @@ const props = defineProps({
   isOpen: Boolean,
   mode: String,
   initialData: Object,
-  loading: Boolean,
   models: { type: Array, default: () => [] }
 });
 
-const emit = defineEmits(['close', 'save']);
+const emit = defineEmits(['close', 'save', 'refresh']);
 
 /**
  * 상태 변수
  */
 const form = ref({});
+const errors = ref({});
+const loading = ref(false);
 const problemType = ref('S/W');
 const isUserModalOpen = ref(false);
 const selectedAssigneeIds = ref([]);
@@ -226,9 +245,38 @@ const getStatusLabel = (status) => {
 watch(() => props.isOpen, (newVal) => {
   if (newVal) {
     form.value = JSON.parse(JSON.stringify(props.initialData));
+    errors.value = {};
     selectedAssigneeIds.value = [];
+    loading.value = false;
   }
 }, { immediate: true });
+
+/**
+ * 유효성 검사 로직
+ */
+const validate = () => {
+  const newErrors = {};
+  
+  if (!form.value.title?.trim()) {
+    newErrors.title = t.value.validate_required || '필수 입력 항목입니다.';
+  }
+  
+  if (!form.value.modelInfo) {
+    newErrors.modelInfo = t.value.validate_required || '필수 선택 항목입니다.';
+  }
+
+  if (form.value.type === 'TEST_ITEM') {
+    if (!form.value.targetVersion?.trim()) {
+      newErrors.targetVersion = t.value.validate_required || '필수 입력 항목입니다.';
+    }
+    if (!form.value.requestDate) {
+      newErrors.requestDate = t.value.validate_required || '필수 선택 항목입니다.';
+    }
+  }
+
+  errors.value = newErrors;
+  return Object.keys(newErrors).length === 0;
+};
 
 /**
  * Click Outside Directive
@@ -269,8 +317,48 @@ const toggleAllAssignees = (e) => {
   selectedAssigneeIds.value = e.target.checked ? form.value.assignees.map(u => u.id) : [];
 };
 
-const handleSave = () => {
-  emit('save', form.value);
+const handleSave = async () => {
+  if (!validate()) return;
+  
+  loading.value = true;
+  try {
+    if (props.mode === 'create') {
+      // API 호출: 이슈 생성
+      const response = await issueService.createIssue(form.value);
+      
+      /**
+       * [API 결과 처리 샘플]
+       * if (response.success) {
+       *    alert('이슈가 성공적으로 생성되었습니다.');
+       * } else {
+       *    alert('생성 실패: ' + response.message);
+       * }
+       */
+      alert('이슈가 생성되었습니다.');
+    } else {
+      // API 호출: 이슈 수정
+      const response = await issueService.updateIssue(form.value.id, form.value);
+      
+      /**
+       * [API 결과 처리 샘플]
+       * if (response.success) {
+       *    alert('수정됐습니다.');
+       * } else {
+       *    alert('수정 실패: ' + response.message);
+       * }
+       */
+      alert('수정됐습니다.');
+    }
+    
+    emit('save', form.value);
+    emit('refresh'); // 부모 컴포넌트에게 목록 갱신 요청
+    emit('close');
+  } catch (error) {
+    console.error('이슈 저장 중 에러 발생:', error);
+    alert('저장 중 오류가 발생했습니다.');
+  } finally {
+    loading.value = false;
+  }
 };
 </script>
 

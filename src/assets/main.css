@@ -9,6 +9,42 @@
   --border-blue: #c1d7ff;    /* 메인 테두리 색상 */
   --text-dark: #172b4d;      /* 메인 본문 색상 */
   --sidebar-bg: #f4f7fb;     /* 사이드바 배경 */
+  --error-red: #de350b;      /* 에러 레드 */
+}
+
+/* Validation Styles */
+.required-mark {
+  color: var(--error-red);
+  margin-right: 4px;
+  font-weight: bold;
+}
+
+.input-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.input-error-msg {
+  color: var(--error-red);
+  font-size: 11px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.has-error input, 
+.has-error select, 
+.has-error textarea {
+  border-bottom: 2px solid var(--error-red) !important;
 }
 
 #app {
