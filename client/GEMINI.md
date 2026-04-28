@@ -36,5 +36,55 @@
 - `src/components/workspace/`: 작업장 상세 정보 (아코디언 및 그리드).
 - `src/assets/main.css`: 전역 블루 테마 변수 및 공통 스타일 정의.
 
+## 5. 데이터베이스 스키마 (Database Schema)
+본 프로토타입 시스템 연동을 위해 필요한 최소한의 테이블 구조입니다.
+
+```sql
+-- 사용자 테이블
+CREATE TABLE users (
+    id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    role VARCHAR(50),
+    dept VARCHAR(100),
+    email VARCHAR(255)
+);
+
+-- 워크스페이스 테이블
+CREATE TABLE workspaces (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT
+);
+
+-- 모델 테이블
+CREATE TABLE models (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    workspace_id INT,
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(100),
+    owner VARCHAR(100),
+    description TEXT,
+    created_date DATE,
+    FOREIGN KEY (workspace_id) REFERENCES workspaces(id)
+);
+
+-- 이슈 테이블
+CREATE TABLE issues (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    workspace_id INT,
+    type ENUM('DEFECT', 'TEST_ITEM') NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    status VARCHAR(50) DEFAULT 'To Do',
+    importance CHAR(1),
+    frequency VARCHAR(50),
+    model_info VARCHAR(255),
+    assignee_id VARCHAR(50),
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (workspace_id) REFERENCES workspaces(id),
+    FOREIGN KEY (assignee_id) REFERENCES users(id)
+);
+```
+
 ---
-*Last Updated: 2024-04-20 (Post-Blue-Theme-Update)*
+*Last Updated: 2024-04-28 (Added DB Schema & External Initializer)*

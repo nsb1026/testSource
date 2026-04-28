@@ -79,12 +79,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { t } from '../../api/i18n';
-import { issueService } from '../../api/issueService';
 
 const props = defineProps({
-  workspaceId: String
+  workspaceId: String,
+  models: {
+    type: Array,
+    default: () => []
+  },
+  allIssues: {
+    type: Array,
+    default: () => []
+  }
 });
 
 defineEmits(['view-issues']);
@@ -93,37 +100,52 @@ const loading = ref(false);
 const dashboardData = ref([]);
 const lastUpdated = ref('');
 
-const fetchDashboardData = async () => {
+const calculateDashboardData = () => {
+  if (!props.models || props.models.length === 0) {
+    dashboardData.value = [];
+    return;
+  }
+  
   loading.value = true;
-  try {
-    // 실제 환경에서는 백엔드에서 통계 데이터를 한 번에 가져오는 API를 호출해야 함
-    // 여기서는 Mock 데이터를 생성하여 시뮬레이션
-    const models = await issueService.fetchModels(props.workspaceId);
-    
-    // 임의의 통계 데이터 생성
-    dashboardData.value = models.map(m => ({
+  
+  // 실제 이슈 데이터를 기반으로 통계 계산
+  dashboardData.value = props.models.map(m => {
+    // 해당 모델의 이슈들만 필터링
+    const modelIssues = props.allIssues.filter(issue => 
+      issue.modelInfo === m.name || issue.modelCode === m.id
+    );
+
+    const getCount = (type, status) => {
+      return modelIssues.filter(i => i.type === type && i.status === status).length;
+    };
+
+    return {
       modelName: m.name,
-      total: Math.floor(Math.random() * 50) + 10,
+      total: modelIssues.length,
       testRequest: {
-        todo: Math.floor(Math.random() * 10),
-        inprogress: Math.floor(Math.random() * 5),
-        done: Math.floor(Math.random() * 15)
+        todo: getCount('TEST_ITEM', 'To Do'),
+        inprogress: getCount('TEST_ITEM', 'In Progress'),
+        done: getCount('TEST_ITEM', 'Done')
       },
       problem: {
-        todo: Math.floor(Math.random() * 8),
-        inprogress: Math.floor(Math.random() * 10),
-        done: Math.floor(Math.random() * 12)
+        todo: getCount('DEFECT', 'To Do'),
+        inprogress: getCount('DEFECT', 'In Progress'),
+        done: getCount('DEFECT', 'Done')
       }
-    }));
-    
-    lastUpdated.value = new Date().toLocaleTimeString();
-  } finally {
-    loading.value = false;
-  }
+    };
+  });
+  
+  lastUpdated.value = new Date().toLocaleTimeString();
+  loading.value = false;
 };
 
+// models나 issues가 변경되면 다시 계산
+watch([() => props.models, () => props.allIssues], () => {
+  calculateDashboardData();
+}, { immediate: true, deep: true });
+
 onMounted(() => {
-  fetchDashboardData();
+  calculateDashboardData();
 });
 </script>
 

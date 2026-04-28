@@ -13,12 +13,28 @@ const apiClient = axios.create({
 });
 
 /**
- * 응답 인터셉터 (에러 처리 공통화)
+ * 응답 인터셉터 (로그 및 에러 처리 공통화)
  */
+apiClient.interceptors.request.use((config) => {
+  console.log(`%c🚀 [API Request] ${config.method?.toUpperCase()} ${config.url}`, 'color: #0052cc; font-weight: bold;', {
+    params: config.params,
+    data: config.data,
+    headers: config.headers
+  });
+  return config;
+});
+
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`%c✅ [API Response] ${response.config.method?.toUpperCase()} ${response.config.url} (${response.status})`, 'color: #00875a; font-weight: bold;', response.data);
+    return response;
+  },
   (error) => {
-    console.error('API 통신 에러:', error.response?.data || error.message);
+    console.error(`%c❌ [API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url}`, 'color: #de350b; font-weight: bold;', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data
+    });
     return Promise.reject(error);
   }
 );
@@ -42,11 +58,24 @@ export const issueService = {
   },
 
   /**
+   * 사용자 상세 정보 조회
+   */
+  async fetchUserInfo(userId) {
+    try {
+      const response = await apiClient.get(`/users/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error('fetchUserInfo error:', error);
+      return { id: userId, name: '알 수 없는 사용자' };
+    }
+  },
+
+  /**
    * 모델 목록 조회
    */
   async fetchModels(workspaceId = null) {
     try {
-      const response = await apiClient.get('/models', { params: { workspaceId } });
+      const response = await apiClient.get('/workspace/models', { params: { workspaceId } });
       return response.data;
     } catch (error) {
       console.error('fetchModels error:', error);
