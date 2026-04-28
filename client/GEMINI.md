@@ -56,6 +56,17 @@ CREATE TABLE workspaces (
     description TEXT
 );
 
+ 3. 작업장 멤버 매핑 테이블 (N:M)
+   CREATE TABLE workspace_members (
+       workspace_id INT,
+       user_id INT,
+       joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+       PRIMARY KEY (workspace_id, user_id),
+       FOREIGN KEY (workspace_id) REFERENCES workspaces(id),
+       FOREIGN KEY (user_id) REFERENCES users(id)
+   );
+  
+
 -- 모델 테이블
 CREATE TABLE models (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -84,7 +95,84 @@ CREATE TABLE issues (
     FOREIGN KEY (workspace_id) REFERENCES workspaces(id),
     FOREIGN KEY (assignee_id) REFERENCES users(id)
 );
+
+  -- 6. 이슈 담당자 매핑 (다중 담당자 지원 가능)
+   CREATE TABLE issue_assignees (
+       issue_id INT,
+       user_id INT,
+       PRIMARY KEY (issue_id, user_id),
+       FOREIGN KEY (issue_id) REFERENCES issues(id),
+       FOREIGN KEY (user_id) REFERENCES users(id)
+   );
+  
+   -- 7. 결재 정보 테이블 (작업장 관련 결재)
+   CREATE TABLE approvals (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       workspace_id INT,
+       step INT,                  -- 결재 단계 (1, 2, 3...)
+       type VARCHAR(50),          -- 기안, 합의, 결재
+       user_id INT,               -- 결재자
+       status VARCHAR(20),        -- Completed, Pending, Rejected
+       approval_date DATETIME,
+       FOREIGN KEY (workspace_id) REFERENCES workspaces(id),
+       FOREIGN KEY (user_id) REFERENCES users(id)
+   );
+  
+   -- 8. 이슈 댓글 테이블
+   CREATE TABLE comments (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       issue_id INT,
+       user_id INT,
+       content TEXT,
+       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+       FOREIGN KEY (issue_id) REFERENCES issues(id),
+       FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+   
+
+ INSERT INTO users (name, role, dept, email) VALUES
+   ('홍길동', 'Admin', 'Management', 'admin@example.com'),
+   ('김철수', 'Developer', 'S/W', 'chul@example.com'),
+   ('이영희', 'Designer', 'Design', 'young@example.com'),
+   ('박지민', 'Developer', 'S/W', 'jimin@example.com'),
+   ('최현우', 'PL', 'S/W', 'hwoo@example.com');
+  
+   -- 2. 작업장 추가
+   INSERT INTO workspaces (name, creator_id, description) VALUES
+   ('차세대 웹 고도화 프로젝트', 1, 'Vue 3와 Express를 이용한 시스템 통합 관리 작업장입니다.');
+  
+   -- 3. 작업장 멤버 할당
+   INSERT INTO workspace_members (workspace_id, user_id) VALUES
+   (1, 1), (1, 2), (1, 3), (1, 4), (1, 5);
+  
+   -- 4. 결재 정보 추가
+   INSERT INTO approvals (workspace_id, step, type, user_id, status, approval_date) VALUES
+   (1, 1, '기안', 1, 'Completed', '2024-04-20 09:00:00'),
+   (1, 2, '합의', 2, 'Completed', '2024-04-21 14:00:00'),
+   (1, 3, '결재', 5, 'Pending', NULL);
+  
+   -- 5. 모델 정보 추가
+   INSERT INTO models (workspace_id, code, name, category, owner_id, project_code, project_name, project_pl, status, description) VALUES
+   (1, 'M-101', 'Web-v1.0', 'Frontend', 2, 'P-AAA', '차세대 웹 고도화', '최현우', 'Active', '기본 프론트엔드 모델'),
+   (1, 'M-201', 'Backend-Node', 'Backend', 4, 'P-BBB', '공통 API 구축', '강PL', 'Draft', 'Node.js 기반 백엔드');
+  
+   -- 6. 이슈 추가
+   INSERT INTO issues (workspace_id, type, title, status, work_type, model_id, importance, frequency, description, reproduction_path) VALUES
+   (1, 'DEFECT', '로그인 화면 버튼 클릭 안됨', 'In Progress', 'Bug', 1, 'A', 'Always', '<p>로그인 버튼이 특정 브라우저에서 작동하지 않습니다.</p>', '1. 접속 2. 클릭 3.
+   반응없음'),
+   (1, 'TEST_ITEM', 'API 성능 테스트 의뢰', 'To Do', 'Task', 2, 'B', 'One', '<p>부하 테스트 진행 필요</p>', 'N/A');
+
+
+  -- 7. 이슈 담당자 할당
+   INSERT INTO issue_assignees (issue_id, user_id) VALUES
+   (1, 2), (1, 4), (2, 4);
+  
+   -- 8. 댓글 추가
+   INSERT INTO comments (issue_id, user_id, content) VALUES
+   (1, 2, '현재 원인 파악 중입니다.'),
+   (1, 1, '최대한 빨리 확인 부탁드립니다.');
 ```
+
 
 ---
 *Last Updated: 2024-04-28 (Added DB Schema & External Initializer)*
