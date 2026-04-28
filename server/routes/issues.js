@@ -3,38 +3,39 @@ const router = express.Router();
 const db = require('../db');
 
 /**
- * 1. 이슈 목록 조회 (Pagination)
+ * 1. 이슈 목록 조회 (Pagination & Join)
  */
 router.get('/', async (req, res) => {
   const { page = 0, size = 30, workspaceId } = req.query;
-  const offset = page * size;
+  const offset = parseInt(page) * parseInt(size);
 
   try {
-    const totalElements = 100;
-    const issues = Array.from({ length: size }, (_, i) => ({
-      id: parseInt(offset) + i + 1,
-      type: (i + 1) % 2 === 0 ? 'DEFECT' : 'TEST_ITEM',
-      title: `[${workspaceId || 'Default'}] 서버 이슈 ${parseInt(offset) + i + 1}`,
-      status: 'To Do',
-      workspace: workspaceId || 'Jira Clone Workspace',
-      workType: 'Bug',
-      modelInfo: 'Web-v1.0',
-      importance: 'B',
-      frequency: 'One',
-      assignees: [],
-      description: '<p>서버에서 온 데이터입니다.</p>',
-      reproductionPath: '',
-      comments: []
-    }));
+    // 이슈 목록 조회 (모델 정보 포함)
+    const [rows] = await db.query(`
+      SELECT i.*, m.name as modelInfo 
+      FROM issues i 
+      LEFT JOIN models m ON i.model_id = m.id 
+      WHERE i.workspace_id = ? 
+      ORDER BY i.created_at DESC 
+      LIMIT ? OFFSET ?
+    `, [workspaceId, parseInt(size), offset]);
+
+    // 전체 개수 조회
+    const [totalRows] = await db.query(`
+      SELECT COUNT(*) as totalElements FROM issues WHERE workspace_id = ?
+    `, [workspaceId]);
+
+    const totalElements = totalRows[0].totalElements;
 
     res.json({
-      content: issues,
+      content: rows,
       totalPages: Math.ceil(totalElements / size),
       totalElements,
       number: parseInt(page),
       size: parseInt(size)
     });
   } catch (error) {
+    console.error('Fetch issues error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -43,10 +44,37 @@ router.get('/', async (req, res) => {
  * 2. 이슈 생성
  */
 router.post('/', async (req, res) => {
-  const data = req.body;
+  const {
+    workspace_id,
+    type,
+    title,
+    status = 'To Do',
+    work_type,
+    model_id,
+    importance,
+    frequency,
+    description,
+    reproduction_path
+  } = req.body;
+
   try {
-    res.json({ success: true, data: { ...data, id: Math.floor(Math.random() * 1000) } });
+    const [result] = await db.query(`
+      INSERT INTO issues (
+        workspace_id, type, title, status, work_type, 
+        model_id, importance, frequency, description, reproduction_path
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      workspace_id, type, title, status, work_type, 
+      model_id, importance, frequency, description, reproduction_path
+    ]);
+
+    res.json({ 
+      success: true, 
+      id: result.insertId,
+      message: '이슈가 성공적으로 생성되었습니다.' 
+    });
   } catch (error) {
+    console.error('Create issue error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -56,10 +84,42 @@ router.post('/', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const data = req.body;
+  const updateData = req.body;
+  
+  // 수정 가능한 필드 제한 (보안 및 무결성)
+  const allowedFields = [
+    'title', 'status', 'work_type', 'importance', 
+    'frequency', 'description', 'reproduction_path'
+  ];
+  
+  const sets = [];
+  const values = [];
+
+  Object.keys(updateData).forEach(key => {
+    if (allowedFields.includes(key)) {
+      sets.push(`${key} = ?`);
+      values.push(updateData[key]);
+    }
+  });
+
+  if (sets.length === 0) {
+    return res.status(400).json({ error: '수정할 데이터가 없습니다.' });
+  }
+
+  values.push(id);
+
   try {
-    res.json({ success: true, id, data });
+    await db.query(`
+      UPDATE issues SET ${sets.join(', ')} WHERE id = ?
+    `, values);
+
+    res.json({ 
+      success: true, 
+      id, 
+      message: '이슈가 성공적으로 수정되었습니다.' 
+    });
   } catch (error) {
+    console.error('Update issue error:', error);
     res.status(500).json({ error: error.message });
   }
 });

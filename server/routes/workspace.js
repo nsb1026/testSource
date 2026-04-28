@@ -1,28 +1,51 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../db');
 
 /**
- * 작업장 상세 정보 조회
+ * 작업장 상세 정보 조회 (복합 정보)
  */
 router.get('/', async (req, res) => {
   const { workspaceId } = req.query;
+  
   try {
+    // 1. 기본 정보
+    const [workspaces] = await db.query('SELECT * FROM workspaces WHERE id = ?', [workspaceId]);
+    if (workspaces.length === 0) {
+      return res.status(404).json({ error: '작업장을 찾을 수 없습니다.' });
+    }
+    const workspace = workspaces[0];
+
+    // 2. 멤버 정보
+    const [members] = await db.query(`
+      SELECT u.id, u.name, u.role, u.dept, u.email 
+      FROM users u
+      JOIN workspace_members wm ON u.id = wm.user_id
+      WHERE wm.workspace_id = ?
+    `, [workspaceId]);
+
+    // 3. 결재 정보
+    const [approvals] = await db.query(`
+      SELECT a.*, u.name as user 
+      FROM approvals a
+      JOIN users u ON a.user_id = u.id
+      WHERE a.workspace_id = ?
+      ORDER BY a.step ASC
+    `, [workspaceId]);
+
+    // 4. 등록 모델 정보
+    const [registeredModels] = await db.query(`
+      SELECT * FROM models WHERE workspace_id = ?
+    `, [workspaceId]);
+
     res.json({
-      name: workspaceId ? `Server Workspace [${workspaceId}]` : 'Jira Clone Server Workspace',
-      creator: '서버 관리자',
-      createdDate: '2024-01-01',
-      description: 'Express 서버 연동 작업장입니다.',
-      approvals: [
-        { step: 1, type: '기안', user: '홍길동', status: 'Completed', date: '2024-04-28 09:00:00' }
-      ],
-      members: [
-        { id: 1, name: '백엔드', role: 'Developer', dept: 'Server', email: 'backend@example.com' }
-      ],
-      registeredModels: [
-        { code: 'SM-101', name: 'Server-v1.0', projectCode: 'P-SVR', projectName: '서버 연동 프로젝트', status: 'Active' }
-      ]
+      ...workspace,
+      members,
+      approvals,
+      registeredModels
     });
   } catch (error) {
+    console.error('Fetch workspace error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -31,11 +54,10 @@ router.get('/', async (req, res) => {
  * 모델 목록 조회
  */
 router.get('/models', async (req, res) => {
+  const { workspaceId } = req.query;
   try {
-    res.json([
-      { id: 1, name: 'Web-v1.0', category: 'Frontend', owner: '김백엔', createdDate: '2024-01-01', description: 'Backend-connected v1.0' },
-      { id: 2, name: 'Web-v1.1', category: 'Frontend', owner: '박서버', createdDate: '2024-03-15', description: 'Backend-connected v1.1' }
-    ]);
+    const [rows] = await db.query('SELECT * FROM models WHERE workspace_id = ?', [workspaceId]);
+    res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
