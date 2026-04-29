@@ -153,3 +153,55 @@ body {
 .detail-header h1 { font-size: 24px; color: var(--dark-blue); margin-bottom: 24px; }
 .section-title { font-size: 16px; font-weight: 700; margin: 24px 0 12px; color: var(--dark-blue); border-bottom: 1px solid var(--border-blue); padding-bottom: 8px; }
 .description-box { padding: 16px; background: var(--pale-blue); border: 1px solid var(--border-blue); border-radius: 4px; min-height: 100px; }
+
+/* ====================================================
+   개선된 기능: Iframe Mode 및 부드러운 애니메이션
+==================================================== */
+/* 부모 시스템에 헤더/메뉴가 있을 경우 자체 헤더/메뉴를 숨기는 클래스 */
+body.iframe-mode .top-bar,
+body.iframe-mode .sidebar {
+  display: none;
+}
+
+/* 로딩 스피너 및 오버레이 */
+.loading-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  background: rgba(248, 251, 255, 0.7);
+  position: absolute;
+  top: 0; left: 0;
+  z-index: 10;
+  backdrop-filter: blur(2px);
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 4px solid rgba(0, 82, 204, 0.1);
+  border-left-color: var(--primary-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* 부드러운 화면 전환 효과 */
+.fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 컨테이너들에 로딩 오버레이를 띄우기 위한 설정 */
+.list-content,
+.issue-detail-container,
+.content-area {
+  position: relative;
+}
+

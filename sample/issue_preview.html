@@ -1,13 +1,14 @@
-<!DOCTYPE html>
-<html lang="ko">
+﻿<!DOCTYPE html>
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>이슈 트래커 디자인 미리보기</title>
+    <title>Jira-Like Issue Tracker (Iframe Optimized JSP)</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<!-- 외부 시스템 프레임 안에 들어갈 때 불필요한 자체 GNB 및 메뉴를 숨기기 위해 iframe-mode 클래스를 활용합니다. -->
+<body class="iframe-mode">
 
-    <!-- TopBar Area -->
+    <!-- TopBar Area (iframe-mode에서는 CSS에 의해 자동으로 숨김 처리됨) -->
     <header class="top-bar">
         <div class="logo">
             <span class="workspace-icon">🏢</span>
@@ -20,97 +21,148 @@
     </header>
 
     <div class="main-container">
-        <!-- Sidebar Area -->
+        <!-- Sidebar Area (iframe-mode에서는 CSS에 의해 자동으로 숨김 처리됨) -->
         <aside class="sidebar">
             <nav>
                 <ul>
-                    <li>
-                        <a href="workspace_preview.html" class="menu-item">
-                            <span class="menu-icon">📊</span>
-                            <span class="menu-label">대시보드</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="menu-item active">
-                            <span class="menu-icon">🎫</span>
-                            <span class="menu-label">이슈</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="menu-item">
-                            <span class="menu-icon">📱</span>
-                            <span class="menu-label">모델 관리</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="workspace_preview.html" class="menu-item">
-                            <span class="menu-icon">ℹ️</span>
-                            <span class="menu-label">작업장 정보</span>
-                        </a>
-                    </li>
+                    <li><a href="#" class="menu-item"><span class="menu-icon">📊</span> 대시보드</a></li>
+                    <li><a href="#" class="menu-item active"><span class="menu-icon">🎫</span> 이슈</a></li>
+                    <li><a href="#" class="menu-item"><span class="menu-icon">📱</span> 모델 관리</a></li>
+                    <li><a href="workspace_detail.jsp" class="menu-item"><span class="menu-icon">ℹ️</span> 작업장 정보</a></li>
                 </ul>
             </nav>
         </aside>
 
-        <!-- Main Content Area -->
+        <!-- Main Content Area (iframe 내부에서 주력으로 보여질 영역) -->
         <div class="content-area">
             
             <!-- Issue List (Left Panel) -->
             <div class="issue-list-container">
                 <div class="list-header">
                     <div class="title-area">
-                        <h2 style="font-size: 16px; font-weight: 700;">이슈 (5)</h2>
+                        <h2 style="font-size: 16px; font-weight: 700;">이슈 (<span id="total-count">0</span>)</h2>
                     </div>
                     <button class="create-btn">+ 만들기</button>
                 </div>
-
-                <div class="list-content">
-                    <div class="issue-card selected">
-                        <div class="issue-title">로그인 화면 버튼 클릭 안됨</div>
-                        <div style="font-size: 11px; color: var(--primary-blue); font-weight: 700;">Web-v1.0</div>
-                        <div class="issue-meta">
-                            <span class="status-tag progress">In Progress</span>
-                            <span style="font-size: 11px; color: #8993a4;">ISSUE-1</span>
-                        </div>
-                    </div>
-                    <div class="issue-card">
-                        <div class="issue-title">API 성능 테스트 의뢰</div>
-                        <div style="font-size: 11px; color: var(--primary-blue); font-weight: 700;">Backend-Node</div>
-                        <div class="issue-meta">
-                            <span class="status-tag todo">To Do</span>
-                            <span style="font-size: 11px; color: #8993a4;">ISSUE-2</span>
-                        </div>
-                    </div>
-                    <div class="issue-card">
-                        <div class="issue-title">모바일 레이아웃 깨짐 현상</div>
-                        <div style="font-size: 11px; color: var(--primary-blue); font-weight: 700;">Web-v1.0</div>
-                        <div class="issue-meta">
-                            <span class="status-tag todo">To Do</span>
-                            <span style="font-size: 11px; color: #8993a4;">ISSUE-3</span>
-                        </div>
-                    </div>
+                
+                <!-- 리스트 출력 영역 (AJAX로 로드됨) -->
+                <div class="list-content" id="issue-list-wrapper">
+                    <!-- JavaScript 동적 렌더링 위치 -->
                 </div>
             </div>
 
             <!-- Issue Detail (Right Panel) -->
-            <div class="issue-detail-container">
-                <div class="detail-header">
-                    <h1>로그인 화면 버튼 클릭 안됨</h1>
-                </div>
-                <div class="detail-body">
-                    <div class="section-title">기본 정보</div>
-                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                        <tr><td style="padding: 8px; color: #5e6c84; width: 120px;">유형</td><td style="padding: 8px; font-weight: 600;">DEFECT (문제점)</td></tr>
-                        <tr><td style="padding: 8px; color: #5e6c84;">상태</td><td style="padding: 8px;"><span class="status-tag progress">In Progress</span></td></tr>
-                        <tr><td style="padding: 8px; color: #5e6c84;">담당자</td><td style="padding: 8px; font-weight: 600;">김철수</td></tr>
-                    </table>
-                    <div class="section-title">상세 설명</div>
-                    <div class="description-box">
-                        <p>로그인 버튼이 특정 브라우저(Safari)에서 작동하지 않는 현상이 발견되었습니다.</p>
-                    </div>
-                </div>
+            <div class="issue-detail-container" id="issue-detail-wrapper">
+                <!-- JavaScript 동적 렌더링 위치 -->
             </div>
+
         </div>
     </div>
+
+    <!-- 비동기 통신(Ajax/Fetch) 및 UI 렌더링 스크립트 -->
+    <script>
+        // 가상의 외부 API 데이터 (실제 업무에서는 JSP 내에서 fetch('/api/issues') 호출)
+        const mockIssueData = [
+            { id: 1, title: '로그인 화면 버튼 클릭 안됨', model: 'Web-v1.0', status: 'In Progress', type: 'DEFECT (문제점)', assignee: '김철수', desc: '로그인 버튼이 특정 브라우저(Safari)에서 작동하지 않는 현상이 발견되었습니다.' },
+            { id: 2, title: 'API 성능 테스트 의뢰', model: 'Backend-Node', status: 'To Do', type: 'TEST_ITEM (시험의뢰)', assignee: '박지민', desc: '부하 테스트 진행 부탁드립니다.' },
+            { id: 3, title: '모바일 레이아웃 깨짐 현상', model: 'Web-v1.0', status: 'To Do', type: 'DEFECT (문제점)', assignee: '이영희', desc: '아이폰 기기에서 화면 우측이 잘리는 현상.' }
+        ];
+
+        // 로딩 스피너 템플릿
+        const getLoaderHTML = () => `
+            <div class="loading-overlay fade-in">
+                <div class="spinner"></div>
+            </div>
+        `;
+
+        // 1. 이슈 목록 조회 (새로고침 없이 부드럽게)
+        function fetchIssues() {
+            const listWrapper = document.getElementById('issue-list-wrapper');
+            listWrapper.innerHTML = getLoaderHTML();
+
+            // 실제 서버 통신 대기시간을 시뮬레이션 (0.5초)
+            setTimeout(() => {
+                let html = '';
+                mockIssueData.forEach((issue, index) => {
+                    const isSelected = index === 0 ? 'selected' : '';
+                    const statusClass = issue.status === 'In Progress' ? 'progress' : 'todo';
+                    
+                    html += `
+                        <div class="issue-card fade-in \${isSelected}" data-id="\${issue.id}" onclick="loadIssueDetail(\${issue.id})">
+                            <div class="issue-title">\${issue.title}</div>
+                            <div style="font-size: 11px; color: var(--primary-blue); font-weight: 700;">\${issue.model}</div>
+                            <div class="issue-meta">
+                                <span class="status-tag \${statusClass}">\${issue.status}</span>
+                                <span style="font-size: 11px; color: #8993a4;">ISSUE-\${issue.id}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                listWrapper.innerHTML = html;
+                document.getElementById('total-count').innerText = mockIssueData.length;
+
+                // 리스트 로딩 후 첫 번째 아이템 상세 화면 자동 렌더링
+                if(mockIssueData.length > 0) {
+                    loadIssueDetail(mockIssueData[0].id, false);
+                }
+            }, 500);
+        }
+
+        // 2. 개별 이슈 상세 조회 (클릭 시 화면 깜빡임 없이 패널만 업데이트)
+        function loadIssueDetail(issueId, userClicked = true) {
+            const detailWrapper = document.getElementById('issue-detail-wrapper');
+            
+            // 리스트 포커스 변경
+            if(userClicked) {
+                document.querySelectorAll('.issue-card').forEach(card => card.classList.remove('selected'));
+                document.querySelector('.issue-card[data-id="'+issueId+'"]').classList.add('selected');
+            }
+
+            // 우측 패널에 부드러운 로딩 시작
+            detailWrapper.innerHTML = getLoaderHTML();
+
+            // 상세 데이터 통신 대기시간 시뮬레이션 (0.3초)
+            setTimeout(() => {
+                const issue = mockIssueData.find(item => item.id === issueId);
+                if(!issue) return;
+
+                const statusClass = issue.status === 'In Progress' ? 'progress' : 'todo';
+                
+                detailWrapper.innerHTML = `
+                    <div class="fade-in">
+                        <div class="detail-header">
+                            <h1>\${issue.title}</h1>
+                        </div>
+                        <div class="detail-body">
+                            <div class="section-title">기본 정보</div>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                <tr><td style="padding: 8px; color: #5e6c84; width: 120px;">유형</td><td style="padding: 8px; font-weight: 600;">\${issue.type}</td></tr>
+                                <tr><td style="padding: 8px; color: #5e6c84;">상태</td><td style="padding: 8px;"><span class="status-tag \${statusClass}">\${issue.status}</span></td></tr>
+                                <tr><td style="padding: 8px; color: #5e6c84;">담당자</td><td style="padding: 8px; font-weight: 600;">\${issue.assignee}</td></tr>
+                            </table>
+                            <div class="section-title">상세 설명</div>
+                            <div class="description-box">
+                                <p>\${issue.desc}</p>
+                            </div>
+                            <div class="section-title">댓글</div>
+                            <div style="margin-top: 16px;">
+                                <textarea style="width: 100%; height: 80px; padding: 12px; border: 1px solid var(--border-blue); border-radius: 4px; font-family: inherit;" placeholder="댓글을 입력하세요..."></textarea>
+                                <button class="create-btn" style="margin-top: 8px; float: right;">댓글 추가</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }, 300);
+        }
+
+        // 페이지 초기화 시 자동 실행
+        document.addEventListener('DOMContentLoaded', () => {
+            // 실제 외부 시스템 Iframe에 들어갔는지 체크하여 메뉴 자동 숨김 (필요시 활성화)
+            // if (window.self !== window.top) { document.body.classList.add('iframe-mode'); }
+            
+            fetchIssues();
+        });
+    </script>
 </body>
 </html>
