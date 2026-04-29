@@ -1,0 +1,155 @@
+/* Jira-like Professional Blue Theme */
+:root {
+  --primary-blue: #0052cc;   /* 메인 브랜드 블루 */
+  --light-blue: #deebff;     /* 선택된 항목 배경 */
+  --soft-blue: #f0f5ff;      /* 섹션 헤더/테이블 헤더 배경 */
+  --pale-blue: #f8fbff;      /* 전체 페이지/카드 배경 */
+  --dark-blue: #0747a6;      /* 제목/강조 텍스트 */
+  --border-blue: #c1d7ff;    /* 메인 테두리 색상 */
+  --text-dark: #172b4d;      /* 메인 본문 색상 */
+  --sidebar-bg: #f4f7fb;     /* 사이드바 배경 */
+  --error-red: #de350b;      /* 에러 레드 */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--text-dark);
+  background-color: var(--pale-blue);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Layout */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  height: 56px;
+  background-color: #ffffff;
+  border-bottom: 2px solid var(--border-blue);
+  z-index: 1000;
+}
+
+.main-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 240px;
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border-blue);
+  padding: 24px 0;
+}
+
+.content-area {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+/* TopBar Styles */
+.logo { display: flex; align-items: center; gap: 12px; }
+.workspace-icon { font-size: 24px; }
+.workspace-name { font-size: 18px; font-weight: 700; color: var(--dark-blue); }
+
+.user-session {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.avatar {
+  width: 32px;
+  height: 32px;
+  background-color: var(--primary-blue);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Sidebar Styles */
+.sidebar ul { list-style: none; }
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  cursor: pointer;
+  color: #42526e;
+  transition: all 0.2s;
+  border-left: 4px solid transparent;
+  text-decoration: none;
+}
+.menu-item:hover { background-color: var(--soft-blue); color: var(--primary-blue); }
+.menu-item.active {
+  background-color: var(--light-blue);
+  color: var(--primary-blue);
+  font-weight: 600;
+  border-left-color: var(--primary-blue);
+}
+
+/* Issue List Styles */
+.issue-list-container {
+  width: 320px;
+  border-right: 2px solid var(--border-blue);
+  display: flex;
+  flex-direction: column;
+}
+
+.list-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-blue);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--pale-blue);
+}
+
+.create-btn {
+  background-color: var(--primary-blue);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.issue-card {
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--soft-blue);
+  cursor: pointer;
+}
+.issue-card:hover { background-color: var(--pale-blue); }
+.issue-card.selected { background-color: var(--light-blue); border-left: 4px solid var(--primary-blue); }
+
+.issue-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--text-dark); }
+.issue-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.status-tag { font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; }
+.status-tag.todo { background: var(--border-blue); color: var(--dark-blue); }
+.status-tag.progress { background: var(--primary-blue); color: white; }
+
+/* Issue Detail Styles */
+.issue-detail-container {
+  flex: 1;
+  padding: 32px 40px;
+  overflow-y: auto;
+}
+.detail-header h1 { font-size: 24px; color: var(--dark-blue); margin-bottom: 24px; }
+.section-title { font-size: 16px; font-weight: 700; margin: 24px 0 12px; color: var(--dark-blue); border-bottom: 1px solid var(--border-blue); padding-bottom: 8px; }
+.description-box { padding: 16px; background: var(--pale-blue); border: 1px solid var(--border-blue); border-radius: 4px; min-height: 100px; }
