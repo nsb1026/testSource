@@ -86,15 +86,15 @@
                 let html = '';
                 mockIssueData.forEach((issue, index) => {
                     const isSelected = index === 0 ? 'selected' : '';
-                    const statusClass = issue.status === 'In Progress' ? 'progress' : 'todo';
+                    const statusClass = issue.status === 'In Progress' ? 'in-progress' : 'to-do';
                     
                     html += `
                         <div class="issue-card fade-in \${isSelected}" data-id="\${issue.id}" onclick="loadIssueDetail(\${issue.id})">
                             <div class="issue-title">\${issue.title}</div>
-                            <div style="font-size: 11px; color: var(--primary-blue); font-weight: 700;">\${issue.model}</div>
+                            <div class="issue-model-info">\${issue.model}</div>
                             <div class="issue-meta">
                                 <span class="status-tag \${statusClass}">\${issue.status}</span>
-                                <span style="font-size: 11px; color: #8993a4;">ISSUE-\${issue.id}</span>
+                                <span class="issue-id">ISSUE-\${issue.id}</span>
                             </div>
                         </div>
                     `;
@@ -117,7 +117,8 @@
             // 리스트 포커스 변경
             if(userClicked) {
                 document.querySelectorAll('.issue-card').forEach(card => card.classList.remove('selected'));
-                document.querySelector('.issue-card[data-id="'+issueId+'"]').classList.add('selected');
+                const selectedCard = document.querySelector('.issue-card[data-id="'+issueId+'"]');
+                if(selectedCard) selectedCard.classList.add('selected');
             }
 
             // 우측 패널에 부드러운 로딩 시작
@@ -128,30 +129,63 @@
                 const issue = mockIssueData.find(item => item.id === issueId);
                 if(!issue) return;
 
-                const statusClass = issue.status === 'In Progress' ? 'progress' : 'todo';
+                const statusClass = issue.status === 'In Progress' ? 'in-progress' : 'to-do';
                 
                 detailWrapper.innerHTML = `
-                    <div class="fade-in">
+                    <div class="main-content fade-in">
                         <div class="detail-header">
-                            <h1>\${issue.title}</h1>
-                        </div>
-                        <div class="detail-body">
-                            <div class="section-title">기본 정보</div>
-                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                                <tr><td style="padding: 8px; color: #5e6c84; width: 120px;">유형</td><td style="padding: 8px; font-weight: 600;">\${issue.type}</td></tr>
-                                <tr><td style="padding: 8px; color: #5e6c84;">상태</td><td style="padding: 8px;"><span class="status-tag \${statusClass}">\${issue.status}</span></td></tr>
-                                <tr><td style="padding: 8px; color: #5e6c84;">담당자</td><td style="padding: 8px; font-weight: 600;">\${issue.assignee}</td></tr>
-                            </table>
-                            <div class="section-title">상세 설명</div>
-                            <div class="description-box">
-                                <p>\${issue.desc}</p>
-                            </div>
-                            <div class="section-title">댓글</div>
-                            <div style="margin-top: 16px;">
-                                <textarea style="width: 100%; height: 80px; padding: 12px; border: 1px solid var(--border-blue); border-radius: 4px; font-family: inherit;" placeholder="댓글을 입력하세요..."></textarea>
-                                <button class="create-btn" style="margin-top: 8px; float: right;">댓글 추가</button>
+                            <div class="breadcrumb">Projects / Jira Clone / ISSUE-\${issue.id}</div>
+                            <div class="status-trigger \${statusClass}">
+                                <span class="status-label">\${issue.status}</span>
                             </div>
                         </div>
+                        <div class="content-body">
+                            <div class="info-banner">
+                                <div class="info-item"><label>워크스페이스:</label> <span>차세대 웹 고도화</span></div>
+                                <div class="info-item"><label>모델:</label> <span style="background:white; border:1px solid var(--primary-blue); padding:2px 6px; border-radius:3px; color:var(--primary-blue); font-weight:700;">\${issue.model}</span></div>
+                                <div class="info-item"><label>유형:</label> <span>\${issue.type}</span></div>
+                            </div>
+
+                            <h1 class="issue-detail-title">\${issue.title}</h1>
+
+                            <div class="section">
+                                <h3>상세 설명</h3>
+                                <div class="description-box">
+                                    <p>\${issue.desc}</p>
+                                </div>
+                            </div>
+
+                            <div class="section">
+                                <h3>담당자 정보</h3>
+                                <table class="info-table">
+                                    <thead>
+                                        <tr><th>성명</th><th>부서</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>\${issue.assignee}</td><td>S/W 개발팀</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="section">
+                                <h3>댓글</h3>
+                                <div class="comment-list">
+                                    <div class="comment-item">
+                                        <div class="comment-meta"><strong>관리자</strong> <span>2024-04-28</span></div>
+                                        <div class="comment-content">내용 확인 후 조치 부탁드립니다.</div>
+                                    </div>
+                                </div>
+                                <div class="comment-input-area">
+                                    <textarea class="comment-textarea" placeholder="댓글을 입력하세요..."></textarea>
+                                    <button class="create-btn" style="float: right;">댓글 추가</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="meta-sidebar fade-in">
+                        <div class="meta-field"><label>중요도</label> <span>High</span></div>
+                        <div class="meta-field"><label>빈도</label> <span>Always</span></div>
+                        <div class="meta-field"><label>등록일</label> <span>2024-04-20</span></div>
                     </div>
                 `;
             }, 300);
